@@ -399,11 +399,11 @@
                     <form id="login-form" class="space-y-4">
                         <div>
                             <label for="login-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                            <input type="email" id="login-email" required class="input-field">
+                            <input type="email" id="login-email" required class="input-field" value="alleningles001@gmail.com">
                         </div>
                         <div>
                             <label for="login-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                            <input type="password" id="login-password" required class="input-field">
+                            <input type="password" id="login-password" required class="input-field" value="123456">
                         </div>
                         <p id="login-error" class="text-red-500 text-sm h-5"></p>
                         <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold text-lg">Login</button>
@@ -429,48 +429,328 @@
 
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIza...", authDomain: "...", projectId: "...", ...{} };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentUser = null;
-
-        (async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token.");
-                } else {
-                    await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
-                }
-            } catch (error) {
-                console.error("Automatic sign-in failed:", error);
-            }
-        })();
-
         document.addEventListener('DOMContentLoaded', () => {
+            // State management
+            let currentUser = null;
+            let quitData = {};
+            let intervalId;
+            const LOCAL_STORAGE_KEY = 'breatheFreeData_alleningles001';
+
+            // DOM Elements
+            const loginBtn = document.getElementById('login-btn');
+            const loginPromptBtn = document.getElementById('login-prompt-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userInfo = document.getElementById('user-info');
+            const userEmailEl = document.getElementById('user-email');
+            const authModal = document.getElementById('authModal');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const trackerSignedOutMessage = document.getElementById('tracker-signed-out-message');
+            const trackerSignedInContent = document.getElementById('tracker-signed-in-content');
+            const trackerSetup = document.getElementById('trackerSetup');
+            const trackerDashboard = document.getElementById('trackerDashboard');
+            const startTrackingBtn = document.getElementById('startTrackingBtn');
+            const resetTrackerBtn = document.getElementById('resetTrackerBtn');
+            const daysSmokeFreeEl = document.getElementById('daysSmokeFree');
+            const moneySavedEl = document.getElementById('moneySaved');
+            const cigsNotSmokedEl = document.getElementById('cigsNotSmoked');
+            const lifeRegainedEl = document.getElementById('lifeRegained');
+            const milestonesContainer = document.getElementById('milestonesContainer');
+            const smokeFreeLabel = document.getElementById('smokeFreeLabel');
+            const personalMotivationInput = document.getElementById('personalMotivation');
+            const saveMotivationBtn = document.getElementById('saveMotivationBtn');
+            const motivationDisplay = document.getElementById('motivationDisplay');
+            const motivationText = document.getElementById('motivationText');
+            const editMotivationBtn = document.getElementById('editMotivationBtn');
+            const motivationInputContainer = document.getElementById('motivationInputContainer');
+            const logCravingBtn = document.getElementById('logCravingBtn');
+            const cravingsTotalEl = document.getElementById('cravingsTotal');
+            const cravingsLastEl = document.getElementById('cravingsLast');
+
+            // --- Authentication & UI Updates ---
+
+            const updateUIForLogin = (user) => {
+                currentUser = user;
+                loginBtn.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                userEmailEl.textContent = user.email;
+                
+                trackerSignedOutMessage.classList.add('hidden');
+                trackerSignedInContent.classList.remove('hidden');
+                hideAuthModal();
+                loadTrackerData();
+            };
+
+            const updateUIForLogout = () => {
+                currentUser = null;
+                loginBtn.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+                userEmailEl.textContent = '';
+
+                trackerSignedOutMessage.classList.remove('hidden');
+                trackerSignedInContent.classList.add('hidden');
+                if(intervalId) clearInterval(intervalId);
+                trackerDashboard.classList.add('hidden');
+                trackerSetup.classList.remove('hidden');
+            };
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+                errorEl.textContent = '';
+
+                if (email === 'alleningles001@gmail.com' && password === '123456') {
+                    const user = { email: email };
+                    updateUIForLogin(user);
+                } else {
+                    errorEl.textContent = 'Invalid credentials. Please try again.';
+                }
+            });
+            
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const errorEl = document.getElementById('signup-error');
+                errorEl.textContent = 'Sign up is disabled for this version.';
+            });
+
+            logoutBtn.addEventListener('click', updateUIForLogout);
+
+            const showAuthModal = () => authModal.style.display = 'flex';
+            const hideAuthModal = () => authModal.style.display = 'none';
+            loginBtn.addEventListener('click', showAuthModal);
+            loginPromptBtn.addEventListener('click', showAuthModal);
+            
+            window.addEventListener('click', (event) => {
+                if (event.target === authModal) {
+                    hideAuthModal();
+                }
+            });
+            
+            authModal.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    authModal.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    authModal.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    authModal.querySelector(`#${tabName}`).classList.add('active');
+                });
+            });
+
+
+            // --- Data Persistence (Local Storage) ---
+
+            function saveTrackerData(data) {
+                if (!currentUser) return;
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+                    console.log("Data saved to local storage!");
+                } catch (error) {
+                    console.error("Error saving data to local storage: ", error);
+                }
+            }
+
+            function loadTrackerData() {
+                if (!currentUser) return;
+                const dataString = localStorage.getItem(LOCAL_STORAGE_KEY);
+                const data = dataString ? JSON.parse(dataString) : null;
+
+                if (data && data.quitDate) {
+                    quitData = data;
+                    document.getElementById('quitDate').value = data.quitDate;
+                    document.getElementById('cigsPerDay').value = data.cigsPerDay;
+                    document.getElementById('pricePerPack').value = data.pricePerPack;
+                    
+                    if (data.personalMotivation) {
+                        motivationText.textContent = data.personalMotivation;
+                        motivationInputContainer.classList.add('hidden');
+                        motivationDisplay.classList.remove('hidden');
+                    } else {
+                        motivationInputContainer.classList.remove('hidden');
+                        motivationDisplay.classList.add('hidden');
+                    }
+                    renderCravingsData(data.cravings || []);
+                    startTracker(data);
+                } else {
+                    console.log("No tracker data found in local storage.");
+                    quitData = {}; // Reset data
+                    trackerDashboard.classList.add('hidden');
+                    trackerSetup.classList.remove('hidden');
+                }
+            }
+
+            // --- Tracker Logic ---
+
+            const healthMilestones = [
+                { time: 20 * 60, text: "Your blood pressure and pulse rate return to normal." },
+                { time: 8 * 3600, text: "Oxygen levels in your blood return to normal." },
+                { time: 48 * 3600, text: "Your ability to taste and smell improves." },
+                { time: 72 * 3600, text: "Breathing becomes easier as your bronchial tubes relax." },
+                { time: 14 * 24 * 3600, text: "Your circulation and lung function improve." },
+                { time: 90 * 24 * 3600, text: "Coughing and shortness of breath decrease." },
+                { time: 365 * 24 * 3600, text: "Your risk of coronary heart disease is halved." },
+                { time: 5 * 365 * 24 * 3600, text: "Your stroke risk is reduced to that of a non-smoker." },
+                { time: 10 * 365 * 24 * 3600, text: "Your risk of lung cancer is about half that of a smoker." },
+            ];
+            
+            function startTracker(data) {
+                trackerSetup.classList.add('hidden');
+                trackerDashboard.classList.remove('hidden');
+                quitData = data;
+                if (intervalId) clearInterval(intervalId);
+                updateDashboard();
+                intervalId = setInterval(updateDashboard, 1000);
+            }
+            
+            function formatLifeRegained(minutes) {
+                if (minutes < 60) return `${Math.floor(minutes)} Mins`;
+                const hours = minutes / 60;
+                if (hours < 24) return `${hours.toFixed(1)} Hrs`;
+                const days = hours / 24;
+                return `${days.toFixed(1)} Days`;
+            }
+
+            function updateDashboard() {
+                if (!quitData.quitDate) return;
+                const now = new Date();
+                const quitDate = new Date(quitData.quitDate);
+                const secondsSinceQuit = (now - quitDate) / 1000;
+                
+                if (secondsSinceQuit < 0) {
+                    smokeFreeLabel.textContent = "COUNTDOWN TO FREEDOM";
+                    const secondsToGo = -secondsSinceQuit;
+                    const days = Math.floor(secondsToGo / (24 * 3600));
+                    const hours = Math.floor((secondsToGo % (24 * 3600)) / 3600);
+                    const minutes = Math.floor((secondsToGo % 3600) / 60);
+                    const seconds = Math.floor(secondsToGo % 60);
+
+                    daysSmokeFreeEl.classList.remove('text-5xl');
+                    daysSmokeFreeEl.classList.add('text-4xl');
+                    daysSmokeFreeEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    
+                    moneySavedEl.textContent = "$0";
+                    cigsNotSmokedEl.textContent = "0";
+                    lifeRegainedEl.textContent = "0 Mins";
+                    milestonesContainer.innerHTML = `<p class="text-slate-500">Your health milestones will appear here once your quit journey begins!</p>`;
+                    return;
+                }
+
+                smokeFreeLabel.textContent = "SMOKE-FREE FOR";
+                daysSmokeFreeEl.classList.add('text-5xl');
+                daysSmokeFreeEl.classList.remove('text-4xl');
+
+                const days = secondsSinceQuit / (24 * 3600);
+                const moneyPerCig = quitData.pricePerPack / 20;
+                const cigsPerSecond = quitData.cigsPerDay / (24 * 3600);
+                const cigsAvoided = Math.floor(cigsPerSecond * secondsSinceQuit);
+                const moneySaved = (cigsAvoided * moneyPerCig).toFixed(2);
+                const lifeRegainedInMinutes = cigsAvoided * 11;
+
+                daysSmokeFreeEl.textContent = `${days.toFixed(2)} Days`;
+                moneySavedEl.textContent = `$${moneySaved}`;
+                cigsNotSmokedEl.textContent = cigsAvoided.toLocaleString();
+                lifeRegainedEl.textContent = formatLifeRegained(lifeRegainedInMinutes);
+                renderMilestones(secondsSinceQuit);
+            }
+
+            function renderMilestones(secondsSinceQuit) {
+                milestonesContainer.innerHTML = '';
+                healthMilestones.forEach(milestone => {
+                    const progress = Math.min((secondsSinceQuit / milestone.time) * 100, 100);
+                    const isAchieved = progress >= 100;
+                    milestonesContainer.innerHTML += `
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="font-medium ${isAchieved ? 'text-blue-600' : 'text-slate-700'}">${milestone.text}</p>
+                                ${isAchieved ? '<span class="text-blue-600 font-bold">&#10003; Achieved</span>' : `<span class="text-slate-500 text-sm font-semibold">${Math.floor(progress)}%</span>`}
+                            </div>
+                            <div class="milestone-bar"><div class="milestone-progress" style="width: ${progress}%;"></div></div>
+                        </div>`;
+                });
+            }
+
+            function renderCravingsData(cravings) {
+                cravingsTotalEl.textContent = cravings.length;
+                if (cravings.length > 0) {
+                    const lastCraving = new Date(cravings[cravings.length - 1]);
+                    const now = new Date();
+                    const diffMs = now - lastCraving;
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    cravingsLastEl.textContent = diffHours < 24 ? `${diffHours} hours ago` : `${Math.floor(diffHours / 24)} days ago`;
+                } else {
+                    cravingsLastEl.textContent = 'N/A';
+                }
+            }
+            
+            startTrackingBtn.addEventListener('click', () => {
+                if (!currentUser) { showAuthModal(); return; }
+                const quitDateValue = document.getElementById('quitDate').value;
+                if (!quitDateValue) {
+                    alert("Please select a quit date to begin.");
+                    return;
+                }
+                const data = {
+                    quitDate: quitDateValue,
+                    cigsPerDay: parseFloat(document.getElementById('cigsPerDay').value) || 0,
+                    pricePerPack: parseFloat(document.getElementById('pricePerPack').value) || 0,
+                    personalMotivation: quitData.personalMotivation || "",
+                    cravings: quitData.cravings || []
+                };
+                saveTrackerData(data);
+                startTracker(data);
+            });
+
+            resetTrackerBtn.addEventListener('click', () => {
+                trackerDashboard.classList.add('hidden');
+                trackerSetup.classList.remove('hidden');
+                if (intervalId) clearInterval(intervalId);
+            });
+            
+            saveMotivationBtn.addEventListener('click', () => {
+                const motivation = personalMotivationInput.value.trim();
+                if (motivation && currentUser) {
+                    quitData.personalMotivation = motivation;
+                    saveTrackerData(quitData);
+                    motivationText.textContent = motivation;
+                    motivationInputContainer.classList.add('hidden');
+                    motivationDisplay.classList.remove('hidden');
+                }
+            });
+
+            editMotivationBtn.addEventListener('click', () => {
+                personalMotivationInput.value = quitData.personalMotivation || '';
+                motivationInputContainer.classList.remove('hidden');
+                motivationDisplay.classList.add('hidden');
+            });
+
+            logCravingBtn.addEventListener('click', () => {
+                if (currentUser) {
+                    const newCraving = new Date().toISOString();
+                    if (!quitData.cravings) quitData.cravings = [];
+                    quitData.cravings.push(newCraving);
+                    saveTrackerData(quitData);
+                    renderCravingsData(quitData.cravings);
+                }
+            });
+
+
+            // --- Other UI components (AI Chat, Modals, Accordion) ---
             const accordionHeaders = document.querySelectorAll('.accordion-header');
             accordionHeaders.forEach(header => {
                 header.addEventListener('click', () => {
                     const content = header.nextElementSibling;
                     const icon = header.querySelector('svg');
-                    accordionHeaders.forEach(otherHeader => {
-                        if (otherHeader !== header) {
-                            otherHeader.nextElementSibling.style.maxHeight = null;
-                            otherHeader.querySelector('svg').classList.remove('rotate-180');
-                        }
+                    const isExpanded = content.style.maxHeight;
+                    
+                    accordionHeaders.forEach(h => {
+                        h.nextElementSibling.style.maxHeight = null;
+                        h.querySelector('svg').classList.remove('rotate-180');
                     });
-                    if (content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                        icon.classList.remove('rotate-180');
-                    } else {
+
+                    if (!isExpanded) {
                         content.style.maxHeight = content.scrollHeight + 'px';
                         icon.classList.add('rotate-180');
                     }
@@ -497,11 +777,7 @@
                     if (!response.ok) { throw new Error(`API error: ${response.status}`); }
                     const result = await response.json();
                     const candidate = result.candidates?.[0];
-                    if (candidate?.content?.parts?.[0]?.text) {
-                        cravingMessage.textContent = candidate.content.parts[0].text;
-                    } else {
-                        cravingMessage.textContent = "Take a deep breath. You are stronger than this craving. This feeling will pass soon.";
-                    }
+                    cravingMessage.textContent = candidate?.content?.parts?.[0]?.text || "Take a deep breath. You are stronger than this craving. This feeling will pass soon.";
                 } catch (error) {
                     console.error("Error fetching craving tip:", error);
                     cravingMessage.textContent = "Drink a glass of cold water right now. Focus on the sensation. You can do this.";
@@ -510,6 +786,7 @@
             cravingBusterBtn.addEventListener('click', getCravingTip);
             const closeModal = () => cravingModal.style.display = 'none';
             closeModalBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (event) => { if (event.target === cravingModal) closeModal(); });
 
             const chatBox = document.getElementById('chat-box');
             const chatInput = document.getElementById('chat-input');
@@ -535,220 +812,26 @@
                 let responseText = "I'm having a little trouble connecting right now. Please try again. Remember to breathe deeply.";
                 try {
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) { console.error("API Error:", response.status, await response.text()); }
-                    else { const result = await response.json(); const candidate = result.candidates?.[0]; if (candidate?.content?.parts?.[0]?.text) { responseText = candidate.content.parts[0].text; } }
-                } catch (error) { console.error("Fetch Error:", error); }
-                finally { showTypingIndicator(false); appendMessage(responseText, 'ai'); }
+                    if (response.ok) {
+                         const result = await response.json(); 
+                         const candidate = result.candidates?.[0]; 
+                         if (candidate?.content?.parts?.[0]?.text) { responseText = candidate.content.parts[0].text; }
+                    } else {
+                        console.error("API Error:", response.status, await response.text());
+                    }
+                } catch (error) { 
+                    console.error("Fetch Error:", error); 
+                } finally { 
+                    showTypingIndicator(false); 
+                    appendMessage(responseText, 'ai'); 
+                }
             };
             const handleSendMessage = () => { const userInput = chatInput.value.trim(); if (userInput) { appendMessage(userInput, 'user'); callGemini(userInput); chatInput.value = ''; } };
             sendBtn.addEventListener('click', handleSendMessage);
             chatInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') handleSendMessage(); });
-
-            const loginBtn = document.getElementById('login-btn');
-            const loginPromptBtn = document.getElementById('login-prompt-btn');
-            const logoutBtn = document.getElementById('logout-btn');
-            const userInfo = document.getElementById('user-info');
-            const userEmailEl = document.getElementById('user-email');
-            const authModal = document.getElementById('authModal');
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const trackerSignedOutMessage = document.getElementById('tracker-signed-out-message');
-            const trackerSignedInContent = document.getElementById('tracker-signed-in-content');
-
-            const showAuthModal = () => authModal.style.display = 'flex';
-            const hideAuthModal = () => authModal.style.display = 'none';
-            loginBtn.addEventListener('click', showAuthModal);
-            loginPromptBtn.addEventListener('click', showAuthModal);
-            logoutBtn.addEventListener('click', () => signOut(auth));
-            
-            window.addEventListener('click', (event) => {
-                if (event.target === authModal || event.target === cravingModal) {
-                    hideAuthModal();
-                    closeModal();
-                }
-            });
-
-            authModal.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.dataset.tab;
-                    authModal.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    authModal.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    authModal.querySelector(`#${tabName}`).classList.add('active');
-                });
-            });
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                const errorEl = document.getElementById('login-error');
-                try {
-                    errorEl.textContent = '';
-                    await signInWithEmailAndPassword(auth, email, password);
-                } catch (error) {
-                    console.error("Login error:", error);
-                    errorEl.textContent = error.message.replace('Firebase: ', '');
-                }
-            });
-
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('signup-email').value;
-                const password = document.getElementById('signup-password').value;
-                const errorEl = document.getElementById('signup-error');
-                try {
-                    errorEl.textContent = '';
-                    await createUserWithEmailAndPassword(auth, email, password);
-                } catch (error) {
-                    console.error("Signup error:", error);
-                    errorEl.textContent = error.message.replace('Firebase: ', '');
-                }
-            });
-            
-            const trackerSetup = document.getElementById('trackerSetup');
-            const trackerDashboard = document.getElementById('trackerDashboard');
-            const startTrackingBtn = document.getElementById('startTrackingBtn');
-            const resetTrackerBtn = document.getElementById('resetTrackerBtn');
-            const daysSmokeFreeEl = document.getElementById('daysSmokeFree');
-            const moneySavedEl = document.getElementById('moneySaved');
-            const cigsNotSmokedEl = document.getElementById('cigsNotSmoked');
-            const lifeRegainedEl = document.getElementById('lifeRegained');
-            const milestonesContainer = document.getElementById('milestonesContainer');
-            const smokeFreeLabel = document.getElementById('smokeFreeLabel');
-            // New UI Elements
-            const personalMotivationInput = document.getElementById('personalMotivation');
-            const saveMotivationBtn = document.getElementById('saveMotivationBtn');
-// ... existing code ... -->
-            function updateDashboard() {
-                if (!quitData.quitDate) return;
-                const now = new Date();
-                const quitDate = new Date(quitData.quitDate);
-                const secondsSinceQuit = (now - quitDate) / 1000;
-                
-                if (secondsSinceQuit < 0) {
-                    smokeFreeLabel.textContent = "COUNTDOWN TO FREEDOM";
-                    const secondsToGo = -secondsSinceQuit;
-                    const days = Math.floor(secondsToGo / (24 * 3600));
-                    const hours = Math.floor((secondsToGo % (24 * 3600)) / 3600);
-                    const minutes = Math.floor((secondsToGo % 3600) / 60);
-                    const seconds = Math.floor(secondsToGo % 60);
-
-                    daysSmokeFreeEl.classList.remove('text-5xl');
-                    daysSmokeFreeEl.classList.add('text-4xl');
-                    daysSmokeFreeEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    
-                    moneySavedEl.textContent = "$0";
-                    cigsNotSmokedEl.textContent = "0";
-                    lifeRegainedEl.textContent = "0 Mins";
-                    milestonesContainer.innerHTML = `<p class="text-slate-500">Your health milestones will appear here once your quit journey begins!</p>`;
-                    return;
-                }
-
-                // Restore original state if countdown is finished
-                smokeFreeLabel.textContent = "SMOKE-FREE FOR";
-                daysSmokeFreeEl.classList.add('text-5xl');
-                daysSmokeFreeEl.classList.remove('text-4xl');
-
-                const days = secondsSinceQuit / (24 * 3600);
-                const moneyPerCig = quitData.pricePerPack / 20;
-                const cigsPerSecond = quitData.cigsPerDay / (24 * 3600);
-                const cigsAvoided = Math.floor(cigsPerSecond * secondsSinceQuit);
-                const moneySaved = (cigsAvoided * moneyPerCig).toFixed(2);
-                const lifeRegainedInMinutes = cigsAvoided * 11; // 11 minutes per cigarette
-
-                daysSmokeFreeEl.textContent = `${days.toFixed(2)} Days`;
-                moneySavedEl.textContent = `$${moneySaved}`;
-                cigsNotSmokedEl.textContent = cigsAvoided.toLocaleString();
-                lifeRegainedEl.textContent = formatLifeRegained(lifeRegainedInMinutes);
-                renderMilestones(secondsSinceQuit);
-            }
-
-            function renderMilestones(secondsSinceQuit) {
-                milestonesContainer.innerHTML = '';
-                healthMilestones.forEach(milestone => {
-                    const progress = Math.min((secondsSinceQuit / milestone.time) * 100, 100);
-                    const isAchieved = progress >= 100;
-                    const milestoneEl = document.createElement('div');
-                    milestoneEl.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="font-medium ${isAchieved ? 'text-blue-600' : 'text-slate-700'}">${milestone.text}</p>
-                            ${isAchieved ? '<span class="text-blue-600 font-bold">&#10003; Achieved</span>' : `<span class="text-slate-500 text-sm font-semibold">${Math.floor(progress)}%</span>`}
-                        </div>
-                        <div class="milestone-bar"><div class="milestone-progress" style="width: ${progress}%;"></div></div>`;
-                    milestonesContainer.appendChild(milestoneEl);
-                });
-            }
-
-            function renderCravingsData(cravings) {
-                cravingsTotalEl.textContent = cravings.length;
-                if (cravings.length > 0) {
-                    const lastCraving = new Date(cravings[cravings.length - 1].seconds * 1000);
-                    const now = new Date();
-                    const diffMs = now - lastCraving;
-                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                    if (diffHours < 24) {
-                        cravingsLastEl.textContent = `${diffHours} hours ago`;
-                    } else {
-                        cravingsLastEl.textContent = `${Math.floor(diffHours / 24)} days ago`;
-                    }
-                } else {
-                    cravingsLastEl.textContent = 'N/A';
-                }
-            }
-
-            saveMotivationBtn.addEventListener('click', async () => {
-                const motivation = personalMotivationInput.value.trim();
-                if (motivation && currentUser) {
-                    const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid);
-                    await updateDoc(userDocRef, { personalMotivation: motivation });
-                    quitData.personalMotivation = motivation;
-                    motivationText.textContent = motivation;
-                    motivationInputContainer.classList.add('hidden');
-                    motivationDisplay.classList.remove('hidden');
-                }
-            });
-
-            editMotivationBtn.addEventListener('click', () => {
-                personalMotivationInput.value = quitData.personalMotivation || '';
-                motivationInputContainer.classList.remove('hidden');
-                motivationDisplay.classList.add('hidden');
-            });
-            
-            logCravingBtn.addEventListener('click', async () => {
-                if (currentUser) {
-                    const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid);
-                    const newCraving = new Date();
-                    await updateDoc(userDocRef, { cravings: arrayUnion(newCraving) });
-                    if (!quitData.cravings) quitData.cravings = [];
-                    quitData.cravings.push({seconds: Math.floor(newCraving.getTime()/1000)}); // Simulate Firestore timestamp for immediate render
-                    renderCravingsData(quitData.cravings);
-                }
-            });
-
-            startTrackingBtn.addEventListener('click', () => {
-                if (!currentUser) { showAuthModal(); return; }
-                const quitDate = document.getElementById('quitDate').value;
-                if (!quitDate) {
-                    alert("Please select a quit date to begin.");
-                    return;
-                }
-                const data = {
-                    quitDate,
-                    cigsPerDay: parseFloat(document.getElementById('cigsPerDay').value) || 0,
-                    pricePerPack: parseFloat(document.getElementById('pricePerPack').value) || 0,
-                    personalMotivation: quitData.personalMotivation || "",
-                    cravings: quitData.cravings || []
-                };
-                saveTrackerData(currentUser.uid, data);
-            });
-            
-            resetTrackerBtn.addEventListener('click', () => {
-                trackerDashboard.classList.add('hidden');
-                trackerSetup.classList.remove('hidden');
-                if (intervalId) clearInterval(intervalId);
-            });
         });
     </script>
 </body>
 </html>
+
+
