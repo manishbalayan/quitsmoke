@@ -5,30 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quit Smoking Companion - Your Journey to a Healthier Life</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
         }
         .hero-gradient {
-            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
-        }
-        .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
         }
         .milestone-bar {
-            background-color: #e0e0e0;
+            background-color: #e2e8f0; /* slate-200 */
             border-radius: 9999px;
             overflow: hidden;
+            height: 10px;
         }
         .milestone-progress {
             height: 100%;
-            background: linear-gradient(90deg, #56ab2f, #a8e063);
+            background: linear-gradient(90deg, #3b82f6, #93c5fd); /* blue-500 to blue-300 */
             transition: width 0.5s ease-in-out;
             border-radius: 9999px;
         }
@@ -42,6 +36,8 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
         }
@@ -49,31 +45,35 @@
             animation: fadeIn 0.3s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .chat-box {
             height: 400px;
             overflow-y: auto;
         }
         .user-message {
-            background-color: #dcfce7; /* Light green */
+            background-color: #2563eb; /* blue-600 */
+            color: white;
             align-self: flex-end;
+            border-radius: 20px 20px 4px 20px;
         }
         .ai-message {
-            background-color: #f3f4f6; /* Light gray */
+            background-color: #f1f5f9; /* slate-100 */
+            color: #1e293b; /* slate-800 */
             align-self: flex-start;
+            border-radius: 20px 20px 20px 4px;
         }
         .typing-indicator {
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 10px 16px;
         }
         .typing-indicator span {
             height: 8px;
             width: 8px;
             margin: 0 2px;
-            background-color: #9ca3af;
+            background-color: #94a3b8; /* slate-400 */
             border-radius: 50%;
             display: inline-block;
             animation: bounce 1.4s infinite ease-in-out both;
@@ -84,133 +84,198 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1.0); }
         }
+        #authModal .tab-content { display: none; }
+        #authModal .tab-content.active { display: block; }
+        #authModal .tab.active {
+            border-bottom-color: #2563eb; /* blue-600 */
+            color: #1d4ed8; /* blue-700 */
+            font-weight: 600;
+        }
+        .input-field {
+            @apply w-full p-3 bg-slate-100 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-400 transition-all;
+        }
+        .premium-card {
+            @apply bg-white p-6 rounded-2xl shadow-lg border border-slate-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-slate-50 text-slate-800 antialiased">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <span class="text-xl font-bold text-gray-700">BreatheFree</span>
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-40">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <svg class="w-9 h-9 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span class="text-2xl font-bold text-slate-800">BreatheFree</span>
             </div>
-            <div class="hidden md:flex space-x-8">
-                <a href="#benefits" class="text-gray-600 hover:text-green-600 transition">Benefits</a>
-                <a href="#tips" class="text-gray-600 hover:text-green-600 transition">Tips</a>
-                <a href="#tracker" class="text-gray-600 hover:text-green-600 transition">Tracker</a>
-                <a href="#ai-coach" class="text-gray-600 hover:text-green-600 transition">AI Coach</a>
-                <a href="#resources" class="text-gray-600 hover:text-green-600 transition">Resources</a>
+            <div class="hidden md:flex space-x-8 items-center font-medium text-slate-600">
+                <a href="#benefits" class="hover:text-blue-600 transition-colors">Benefits</a>
+                <a href="#tracker" class="hover:text-blue-600 transition-colors">Tracker</a>
+                <a href="#ai-coach" class="hover:text-blue-600 transition-colors">AI Coach</a>
+                <a href="#resources" class="hover:text-blue-600 transition-colors">Resources</a>
             </div>
-            <a href="#tracker" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition font-medium">Start Now</a>
+            <div id="auth-container" class="flex items-center space-x-4">
+                 <button id="login-btn" class="font-semibold text-white bg-blue-600 px-5 py-2.5 rounded-full hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">Login / Sign Up</button>
+                 <div id="user-info" class="hidden items-center space-x-4">
+                     <span id="user-email" class="text-sm font-medium text-slate-600 hidden sm:block"></span>
+                     <button id="logout-btn" class="font-semibold text-slate-700 bg-slate-200 px-5 py-2.5 rounded-full hover:bg-slate-300 hover:shadow-md transition-all duration-300">Sign Out</button>
+                 </div>
+            </div>
         </nav>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="hero-gradient text-white text-center py-20 px-6">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Take the First Step Towards a Smoke-Free Life</h1>
-            <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">You have the strength to quit. We're here to provide the tools, support, and motivation you need to succeed on your journey.</p>
-            <a href="#tracker" class="bg-white text-green-600 px-8 py-3 rounded-full hover:bg-gray-100 transition font-bold text-lg shadow-lg">Start Your Quit Journey</a>
+        <section class="hero-gradient text-white text-center py-24 px-6 relative overflow-hidden">
+            <div class="absolute inset-0 bg-black opacity-10"></div>
+            <div class="relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">Your Journey to a Smoke-Free Life</h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto mb-10 text-blue-100">You have the strength to quit. We provide the tools, support, and motivation you need to succeed.</p>
+                <a href="#tracker" class="bg-white text-blue-700 px-10 py-4 rounded-full hover:bg-slate-100 transition-all duration-300 font-bold text-lg shadow-2xl hover:shadow-blue-300/50 transform hover:scale-105">Start My Quit Journey</a>
+            </div>
         </section>
 
         <!-- Benefits Section -->
-        <section id="benefits" class="py-20 bg-white">
+        <section id="benefits" class="py-24 bg-white">
             <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-4">Rediscover the Benefits of Being Smoke-Free</h2>
-                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Quitting smoking is the best thing you can do for your health. The benefits start almost immediately.</p>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Rediscover a Healthier You</h2>
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto">The benefits of quitting start almost immediately. Here's what you have to look forward to.</p>
+                </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Benefit Card 1 -->
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm card-hover text-center">
-                        <div class="bg-green-100 text-green-600 rounded-full p-3 inline-block mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    <!-- Cards updated with new premium-card class -->
+                    <div class="premium-card text-center">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-4 inline-block mb-5 ring-8 ring-blue-50">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         </div>
                         <h3 class="font-bold text-xl mb-2">Improved Health</h3>
-                        <p class="text-gray-600">Your lung function improves, your risk of heart disease drops dramatically, and your energy levels increase.</p>
+                        <p class="text-slate-600">Your lung function improves, your risk of heart disease drops dramatically, and your energy levels increase.</p>
                     </div>
-                    <!-- Benefit Card 2 -->
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm card-hover text-center">
-                        <div class="bg-green-100 text-green-600 rounded-full p-3 inline-block mb-4">
-                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M12 6h.01M6 12h.01M18 12h.01M6 18h.01M18 6h.01M6 6h.01M18 18h.01"></path></svg>
+                    <div class="premium-card text-center">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-4 inline-block mb-5 ring-8 ring-blue-50">
+                           <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M12 6h.01M6 12h.01M18 12h.01M6 18h.01M18 6h.01M6 6h.01M18 18h.01"></path></svg>
                         </div>
                         <h3 class="font-bold text-xl mb-2">Financial Savings</h3>
-                        <p class="text-gray-600">Think of what you could do with the money you save. The average smoker saves thousands of dollars a year.</p>
+                        <p class="text-slate-600">Think of what you could do with the money you save. The average smoker saves thousands of dollars a year.</p>
                     </div>
-                    <!-- Benefit Card 3 -->
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm card-hover text-center">
-                        <div class="bg-green-100 text-green-600 rounded-full p-3 inline-block mb-4">
-                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="premium-card text-center">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-4 inline-block mb-5 ring-8 ring-blue-50">
+                           <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <h3 class="font-bold text-xl mb-2">Enhanced Senses</h3>
-                        <p class="text-gray-600">Your sense of taste and smell will return, allowing you to enjoy food and scents more fully than before.</p>
+                        <p class="text-slate-600">Your sense of taste and smell will return, allowing you to enjoy food and scents more fully than before.</p>
                     </div>
-                    <!-- Benefit Card 4 -->
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm card-hover text-center">
-                        <div class="bg-green-100 text-green-600 rounded-full p-3 inline-block mb-4">
-                           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <div class="premium-card text-center">
+                        <div class="bg-blue-100 text-blue-600 rounded-full p-4 inline-block mb-5 ring-8 ring-blue-50">
+                           <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         </div>
                         <h3 class="font-bold text-xl mb-2">Better Appearance</h3>
-                        <p class="text-gray-600">Quitting can prevent premature skin aging, whiten your teeth, and make your hair and breath smell fresher.</p>
+                        <p class="text-slate-600">Quitting can prevent premature skin aging, whiten your teeth, and make your hair and breath smell fresher.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Quit Tracker Section -->
-        <section id="tracker" class="py-20 bg-gray-50">
+        <section id="tracker" class="py-24 bg-slate-50">
             <div class="container mx-auto px-6 text-center">
-                <h2 class="text-3xl font-bold mb-4">Your Personal Quit Tracker</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto mb-8">Set your quit date and watch your progress grow. Every second brings you closer to a healthier you. Your data is saved in your browser and is not stored on our servers.</p>
-
-                <div id="trackerSetup" class="bg-white p-8 rounded-lg shadow-md max-w-lg mx-auto">
-                    <label for="quitDate" class="block text-lg font-medium text-gray-700 mb-2">When did you (or will you) quit?</label>
-                    <input type="date" id="quitDate" class="w-full p-2 border border-gray-300 rounded-md mb-4">
-                    <label for="cigsPerDay" class="block text-sm font-medium text-gray-700 mb-1">Cigarettes per day (average):</label>
-                    <input type="number" id="cigsPerDay" value="20" class="w-full p-2 border border-gray-300 rounded-md mb-4">
-                    <label for="pricePerPack" class="block text-sm font-medium text-gray-700 mb-1">Price per pack (average):</label>
-                    <input type="number" id="pricePerPack" value="10" step="0.01" class="w-full p-2 border border-gray-300 rounded-md mb-4">
-                    <button id="startTrackingBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-bold text-lg">Start Tracking</button>
+                <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Your Personal Quit Dashboard</h2>
+                <div id="tracker-signed-out-message">
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8">Please <button id="login-prompt-btn" class="text-blue-600 font-semibold underline hover:text-blue-700">log in or create an account</button> to save your progress and access it from any device.</p>
                 </div>
+                <div id="tracker-signed-in-content" class="hidden">
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-10">Your journey is a marathon, not a sprint. Track your incredible progress here.</p>
+                    
+                    <div id="trackerDashboard" class="hidden bg-transparent mb-10">
+                        <div class="grid lg:grid-cols-4 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                            <div class="premium-card">
+                                <p id="smokeFreeLabel" class="text-slate-500 font-semibold text-sm tracking-wider uppercase">Smoke-Free For</p>
+                                <p id="daysSmokeFree" class="text-5xl font-extrabold text-blue-600 mt-2">0 Days</p>
+                            </div>
+                            <div class="premium-card">
+                                <p class="text-slate-500 font-semibold text-sm tracking-wider uppercase">Money Saved</p>
+                                <p id="moneySaved" class="text-5xl font-extrabold text-blue-600 mt-2">$0</p>
+                            </div>
+                            <div class="premium-card">
+                                <p class="text-slate-500 font-semibold text-sm tracking-wider uppercase">Cigarettes Avoided</p>
+                                <p id="cigsNotSmoked" class="text-5xl font-extrabold text-blue-600 mt-2">0</p>
+                            </div>
+                             <div class="premium-card">
+                                <p class="text-slate-500 font-semibold text-sm tracking-wider uppercase">Life Regained</p>
+                                <p id="lifeRegained" class="text-3xl font-extrabold text-blue-600 mt-2">0 Mins</p>
+                            </div>
+                        </div>
 
-                <div id="trackerDashboard" class="hidden bg-white p-8 rounded-lg shadow-md max-w-4xl mx-auto">
-                    <div class="grid md:grid-cols-3 gap-6 text-center mb-8">
-                        <div>
-                            <p class="text-gray-500 text-sm">SMOKE-FREE FOR</p>
-                            <p id="daysSmokeFree" class="text-4xl font-bold text-green-600">0 Days</p>
+                        <div class="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mt-8">
+                            <div class="premium-card text-left">
+                                <h3 class="text-xl font-bold mb-4 text-slate-700">My Motivation</h3>
+                                <div id="motivationDisplay" class="hidden p-4 bg-slate-100 rounded-lg min-h-[100px] text-slate-700 italic">
+                                    <p id="motivationText"></p>
+                                    <button id="editMotivationBtn" class="text-sm text-blue-600 font-semibold mt-2">Edit</button>
+                                </div>
+                                <div id="motivationInputContainer">
+                                    <textarea id="personalMotivation" class="input-field w-full" rows="3" placeholder="e.g., To be healthy for my family, to run a 5k..."></textarea>
+                                    <button id="saveMotivationBtn" class="mt-2 w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save My 'Why'</button>
+                                </div>
+                            </div>
+                             <div class="premium-card text-left">
+                                <h3 class="text-xl font-bold mb-4 text-slate-700">Craving Tracker</h3>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-slate-500">Total Cravings Logged: <span id="cravingsTotal" class="font-bold text-blue-600">0</span></p>
+                                        <p class="text-slate-500">Last Craving: <span id="cravingsLast" class="font-bold text-blue-600">N/A</span></p>
+                                    </div>
+                                    <button id="logCravingBtn" class="bg-blue-100 text-blue-700 px-5 py-3 rounded-full hover:bg-blue-200 transition font-bold shadow-sm">Log a Craving</button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-gray-500 text-sm">MONEY SAVED</p>
-                            <p id="moneySaved" class="text-4xl font-bold text-green-600">$0</p>
+
+                        <div class="max-w-6xl mx-auto mt-8">
+                            <h3 class="text-2xl font-bold mb-6 text-slate-700">Health Milestones Achieved</h3>
+                            <div id="milestonesContainer" class="space-y-6 premium-card p-8">
+                                <!-- Milestones will be dynamically inserted here -->
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-gray-500 text-sm">CIGARETTES NOT SMOKED</p>
-                            <p id="cigsNotSmoked" class="text-4xl font-bold text-green-600">0</p>
-                        </div>
+                         <button id="resetTrackerBtn" class="mt-8 font-semibold text-slate-700 bg-slate-200 px-6 py-3 rounded-full hover:bg-slate-300 hover:shadow-md transition-all duration-300">Change My Quit Date</button>
                     </div>
 
-                    <h3 class="text-2xl font-bold mb-6">Health Milestones Achieved</h3>
-                    <div id="milestonesContainer" class="space-y-6">
-                        <!-- Milestones will be dynamically inserted here -->
+                    <div id="trackerSetup" class="premium-card p-8 max-w-lg mx-auto text-left">
+                        <h3 class="text-2xl font-bold mb-6 text-center">My Quit Plan</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="quitDate" class="block text-md font-semibold text-slate-700 mb-2">My Quit Date is:</label>
+                                <input type="date" id="quitDate" class="input-field">
+                            </div>
+                            <div>
+                                <label for="cigsPerDay" class="block text-sm font-medium text-slate-700 mb-1">Cigarettes per day (average):</label>
+                                <input type="number" id="cigsPerDay" value="20" class="input-field">
+                            </div>
+                            <div>
+                                <label for="pricePerPack" class="block text-sm font-medium text-slate-700 mb-1">Price per pack (average):</label>
+                                <input type="number" id="pricePerPack" value="10" step="0.01" class="input-field">
+                            </div>
+                        </div>
+                        <button id="startTrackingBtn" class="w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all duration-300 font-bold text-lg hover:shadow-lg hover:-translate-y-0.5">Save & Start Tracking</button>
                     </div>
-                     <button id="resetTrackerBtn" class="mt-8 bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition font-medium">Reset My Quit Date</button>
                 </div>
             </div>
         </section>
 
-
         <!-- Tips Section -->
-        <section id="tips" class="py-20 bg-white">
+        <section id="tips" class="py-24 bg-white">
             <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center mb-4">Actionable Tips for Success</h2>
-                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Navigating cravings and triggers is key. Here are some strategies to help you stay on track.</p>
-                <div class="max-w-3xl mx-auto">
-                    <div class="accordion-item bg-gray-50 rounded-lg mb-4 shadow-sm">
-                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center hover:bg-gray-100 transition">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Actionable Tips for Success</h2>
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto">Navigating cravings and triggers is key. Here are some strategies to help you stay on track.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="accordion-item bg-white rounded-2xl shadow-lg border border-slate-100">
+                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center transition-colors hover:bg-slate-50 rounded-2xl">
                             <span>Managing Cravings</span>
-                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out px-6">
-                            <ul class="list-disc list-inside py-4 text-gray-600 space-y-2">
+                            <ul class="list-disc list-inside py-4 text-slate-600 space-y-2 border-t">
                                 <li><strong>Delay:</strong> Wait 10 minutes. The urge will likely pass.</li>
                                 <li><strong>Drink Water:</strong> Sip it slowly to satisfy the hand-to-mouth action.</li>
                                 <li><strong>Deep Breaths:</strong> Inhale for 4 seconds, hold for 7, exhale for 8. Repeat.</li>
@@ -218,13 +283,13 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="accordion-item bg-gray-50 rounded-lg mb-4 shadow-sm">
-                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center hover:bg-gray-100 transition">
+                    <div class="accordion-item bg-white rounded-2xl shadow-lg border border-slate-100">
+                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center transition-colors hover:bg-slate-50 rounded-2xl">
                             <span>Building a Support System</span>
-                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out px-6">
-                            <ul class="list-disc list-inside py-4 text-gray-600 space-y-2">
+                            <ul class="list-disc list-inside py-4 text-slate-600 space-y-2 border-t">
                                 <li>Tell friends, family, and coworkers about your plan to quit.</li>
                                 <li>Ask for their support and understanding, especially on tough days.</li>
                                 <li>Consider joining an online support group or using a quit-smoking app.</li>
@@ -232,13 +297,13 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="accordion-item bg-gray-50 rounded-lg mb-4 shadow-sm">
-                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center hover:bg-gray-100 transition">
+                    <div class="accordion-item bg-white rounded-2xl shadow-lg border border-slate-100">
+                        <button class="accordion-header w-full text-left p-6 font-semibold text-lg flex justify-between items-center transition-colors hover:bg-slate-50 rounded-2xl">
                             <span>Changing Your Habits</span>
-                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-6 h-6 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out px-6">
-                             <ul class="list-disc list-inside py-4 text-gray-600 space-y-2">
+                             <ul class="list-disc list-inside py-4 text-slate-600 space-y-2 border-t">
                                 <li>Identify your smoking triggers (e.g., morning coffee, driving, stress).</li>
                                 <li>Develop new routines. Drink tea instead of coffee, or chew gum while driving.</li>
                                 <li>Keep your hands busy with a stress ball, a pen, or healthy snacks.</li>
@@ -251,57 +316,54 @@
         </section>
 
         <!-- Craving Buster -->
-        <section class="bg-green-100 py-20">
+        <section class="bg-blue-100 py-24">
              <div class="container mx-auto px-6 text-center">
-                 <h2 class="text-3xl font-bold text-green-800 mb-4">Feeling a Craving?</h2>
-                 <p class="text-green-700 max-w-2xl mx-auto mb-8">Don't give in. Take a moment for yourself. Click the button below for a quick distraction and a reminder of your strength.</p>
-                 <button id="cravingBusterBtn" class="bg-green-600 text-white px-8 py-4 rounded-full hover:bg-green-700 transition font-bold text-xl shadow-lg transform hover:scale-105">Bust That Craving!</button>
+                 <h2 class="text-4xl font-extrabold text-blue-800 mb-4">Feeling a Craving?</h2>
+                 <p class="text-lg text-blue-700 max-w-2xl mx-auto mb-8">Don't give in. Take a moment for yourself. Click the button below for a quick distraction and a reminder of your strength.</p>
+                 <button id="cravingBusterBtn" class="bg-blue-600 text-white px-10 py-4 rounded-full hover:bg-blue-700 transition-all duration-300 font-bold text-xl shadow-lg hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1">Bust That Craving!</button>
              </div>
         </section>
 
         <!-- AI Quit Coach Section -->
-        <section id="ai-coach" class="py-20 bg-gray-50">
+        <section id="ai-coach" class="py-24 bg-slate-50">
             <div class="container mx-auto px-6">
-                <div class="text-center">
-                    <h2 class="text-3xl font-bold mb-4">Your AI Quit Coach</h2>
-                    <p class="text-gray-600 max-w-2xl mx-auto mb-8">Feeling a craving or need some motivation? Chat with your personal AI coach. It's available 24/7 to provide support, offer distractions, or just listen.</p>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Your AI Quit Coach</h2>
+                    <p class="text-lg text-slate-600 max-w-2xl mx-auto">Feeling a craving or need some motivation? Chat with your personal AI coach. It's available 24/7 to provide support, offer distractions, or just listen.</p>
                 </div>
-                <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-                    <div id="chat-box" class="chat-box p-4 flex flex-col space-y-4">
-                        <!-- AI welcome message -->
-                        <div class="ai-message p-3 rounded-lg max-w-md">
+                <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl border border-slate-100">
+                    <div id="chat-box" class="chat-box p-6 flex flex-col space-y-4">
+                        <div class="ai-message p-3 px-5 rounded-lg max-w-md">
                             <p>Hello! I'm your AI Quit Coach. I'm here to support you. How are you feeling right now?</p>
                         </div>
                     </div>
                     <div id="typing-indicator-container" class="hidden p-4">
-                        <div class="typing-indicator">
-                            <span></span><span></span><span></span>
-                        </div>
+                        <div class="typing-indicator"><span></span><span></span><span></span></div>
                     </div>
-                    <div class="p-4 border-t border-gray-200 flex items-center">
-                        <input type="text" id="chat-input" class="w-full p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Type your message...">
-                        <button id="send-btn" class="bg-green-600 text-white px-6 py-3 rounded-r-lg hover:bg-green-700 transition font-bold">Send</button>
+                    <div class="p-4 border-t border-slate-200 flex items-center bg-white rounded-b-2xl">
+                        <input type="text" id="chat-input" class="w-full p-3 bg-slate-100 border-2 border-transparent rounded-l-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-400 transition-all" placeholder="Type your message...">
+                        <button id="send-btn" class="bg-blue-600 text-white px-6 py-3 rounded-r-xl hover:bg-blue-700 transition font-bold transform hover:scale-105">-&gt;</button>
                     </div>
                 </div>
             </div>
         </section>
         
         <!-- Resources Section -->
-        <section id="resources" class="py-20 bg-white">
+        <section id="resources" class="py-24 bg-white">
             <div class="container mx-auto px-6">
-                 <h2 class="text-3xl font-bold text-center mb-12">Helpful Resources</h2>
+                 <h2 class="text-4xl font-extrabold text-center mb-16 text-slate-800">Helpful Resources</h2>
                  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <a href="https://www.smokefree.gov/" target="_blank" class="block bg-gray-50 p-6 rounded-lg shadow-sm card-hover">
-                        <h3 class="font-bold text-xl mb-2 text-green-700">Smokefree.gov</h3>
-                        <p class="text-gray-600">A comprehensive resource with tools, tips, and support for quitting.</p>
+                    <a href="https://www.smokefree.gov/" target="_blank" class="block bg-slate-50/70 p-6 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-1.5 border border-slate-200">
+                        <h3 class="font-bold text-xl mb-2 text-blue-700">Smokefree.gov</h3>
+                        <p class="text-slate-600">A comprehensive resource with tools, tips, and support for quitting.</p>
                     </a>
-                     <a href="https://www.cdc.gov/tobacco/quit_smoking/" target="_blank" class="block bg-gray-50 p-6 rounded-lg shadow-sm card-hover">
-                        <h3 class="font-bold text-xl mb-2 text-green-700">CDC - Quit Smoking</h3>
-                        <p class="text-gray-600">Information and resources from the Centers for Disease Control and Prevention.</p>
+                     <a href="https://www.cdc.gov/tobacco/quit_smoking/" target="_blank" class="block bg-slate-50/70 p-6 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-1.5 border border-slate-200">
+                        <h3 class="font-bold text-xl mb-2 text-blue-700">CDC - Quit Smoking</h3>
+                        <p class="text-slate-600">Information and resources from the Centers for Disease Control and Prevention.</p>
                     </a>
-                     <a href="https://www.cancer.org/healthy/stay-away-from-tobacco.html" target="_blank" class="block bg-gray-50 p-6 rounded-lg shadow-sm card-hover">
-                        <h3 class="font-bold text-xl mb-2 text-green-700">American Cancer Society</h3>
-                        <p class="text-gray-600">Support for quitting tobacco and information on the health risks.</p>
+                     <a href="https://www.cancer.org/healthy/stay-away-from-tobacco.html" target="_blank" class="block bg-slate-50/70 p-6 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-1.5 border border-slate-200">
+                        <h3 class="font-bold text-xl mb-2 text-blue-700">American Cancer Society</h3>
+                        <p class="text-slate-600">Support for quitting tobacco and information on the health risks.</p>
                     </a>
                  </div>
             </div>
@@ -309,43 +371,102 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
+    <footer class="bg-slate-800 text-white py-12">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 BreatheFree. All Rights Reserved.</p>
-            <p class="text-sm text-gray-400 mt-2">This website provides information and tools to help you quit smoking. It is not a substitute for professional medical advice. Consult with a healthcare provider for personalized guidance.</p>
+            <p class="font-semibold">&copy; 2025 BreatheFree. All Rights Reserved.</p>
+            <p class="text-sm text-slate-400 mt-2 max-w-2xl mx-auto">This website provides information and tools to help you quit smoking. It is not a substitute for professional medical advice. Consult with a healthcare provider for personalized guidance.</p>
         </div>
     </footer>
 
     <!-- Craving Buster Modal -->
     <div id="cravingModal" class="modal">
-        <div class="modal-content bg-white p-8 rounded-lg shadow-2xl max-w-sm mx-4 text-center">
-            <h3 class="text-2xl font-bold text-green-600 mb-4">You're Stronger Than the Craving!</h3>
-            <div id="cravingMessage" class="text-gray-700 text-lg mb-6">
-                <!-- Message will be loaded here -->
+        <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl max-w-sm mx-4 text-center border-4 border-blue-300">
+            <h3 class="text-2xl font-bold text-blue-600 mb-4">You're Stronger Than the Craving!</h3>
+            <div id="cravingMessage" class="text-slate-700 text-lg mb-6"></div>
+            <button id="closeModalBtn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition font-bold">I've Got This</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+            <div class="p-6">
+                <div class="flex border-b mb-6">
+                    <button data-tab="login" class="tab active flex-1 py-3 text-center font-medium text-slate-500 hover:text-slate-800 transition border-b-2 border-transparent">Login</button>
+                    <button data-tab="signup" class="tab flex-1 py-3 text-center font-medium text-slate-500 hover:text-slate-800 transition border-b-2 border-transparent">Sign Up</button>
+                </div>
+                <div id="login" class="tab-content active">
+                    <form id="login-form" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <input type="email" id="login-email" required class="input-field">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                            <input type="password" id="login-password" required class="input-field">
+                        </div>
+                        <p id="login-error" class="text-red-500 text-sm h-5"></p>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold text-lg">Login</button>
+                    </form>
+                </div>
+                <div id="signup" class="tab-content">
+                     <form id="signup-form" class="space-y-4">
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <input type="email" id="signup-email" required class="input-field">
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-slate-700 mb-1">Password (min. 6 characters)</label>
+                            <input type="password" id="signup-password" required class="input-field">
+                        </div>
+                        <p id="signup-error" class="text-red-500 text-sm h-5"></p>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-bold text-lg">Create Account</button>
+                    </form>
+                </div>
             </div>
-            <button id="closeModalBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">I've Got This</button>
         </div>
     </div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            // Accordion Logic
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIza...", authDomain: "...", projectId: "...", ...{} };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        (async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Signed in with custom token.");
+                } else {
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously.");
+                }
+            } catch (error) {
+                console.error("Automatic sign-in failed:", error);
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
             const accordionHeaders = document.querySelectorAll('.accordion-header');
             accordionHeaders.forEach(header => {
                 header.addEventListener('click', () => {
                     const content = header.nextElementSibling;
                     const icon = header.querySelector('svg');
-
-                    // Close other accordions
                     accordionHeaders.forEach(otherHeader => {
                         if (otherHeader !== header) {
                             otherHeader.nextElementSibling.style.maxHeight = null;
                             otherHeader.querySelector('svg').classList.remove('rotate-180');
                         }
                     });
-
                     if (content.style.maxHeight) {
                         content.style.maxHeight = null;
                         icon.classList.remove('rotate-180');
@@ -356,179 +477,190 @@
                 });
             });
 
-            // Craving Buster Modal Logic
             const cravingModal = document.getElementById('cravingModal');
             const cravingBusterBtn = document.getElementById('cravingBusterBtn');
             const closeModalBtn = document.getElementById('closeModalBtn');
             const cravingMessage = document.getElementById('cravingMessage');
 
-            const cravingTips = [
-                "Take 5 deep, slow breaths. Feel your lungs filling with clean air.",
-                "Drink a full glass of cold water. Swish it in your mouth.",
-                "This feeling will pass in a few minutes. You've handled it before, you can handle it now.",
-                "Think about WHY you decided to quit. Visualize your healthier future.",
-                "Step outside for some fresh air or walk around the room for two minutes."
-            ];
-
-            cravingBusterBtn.addEventListener('click', () => {
-                const randomTip = cravingTips[Math.floor(Math.random() * cravingTips.length)];
-                cravingMessage.textContent = randomTip;
+            const getCravingTip = async () => {
+                cravingMessage.innerHTML = '<div class="flex justify-center items-center"><div class="typing-indicator"><span></span><span></span><span></span></div><p class="ml-2">Finding a tip for you...</p></div>';
                 cravingModal.style.display = 'flex';
-            });
-
-            const closeModal = () => {
-                cravingModal.style.display = 'none';
-            };
-
-            closeModalBtn.addEventListener('click', closeModal);
-            window.addEventListener('click', (event) => {
-                if (event.target === cravingModal) {
-                    closeModal();
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const cravingSystemPrompt = `You are an AI assistant focused on helping people quit smoking. Your task is to provide a single, short, encouraging, and actionable tip to help someone overcome an immediate smoking craving. The tip should be concise (1-2 sentences) and practical. Do not sound like a generic bot. Be empathetic and direct.`;
+                const payload = {
+                    contents: [{ parts: [{ text: "I'm having a strong craving right now. Give me one good tip to get through it." }] }],
+                    systemInstruction: { parts: [{ text: cravingSystemPrompt }] },
+                };
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { throw new Error(`API error: ${response.status}`); }
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+                    if (candidate?.content?.parts?.[0]?.text) {
+                        cravingMessage.textContent = candidate.content.parts[0].text;
+                    } else {
+                        cravingMessage.textContent = "Take a deep breath. You are stronger than this craving. This feeling will pass soon.";
+                    }
+                } catch (error) {
+                    console.error("Error fetching craving tip:", error);
+                    cravingMessage.textContent = "Drink a glass of cold water right now. Focus on the sensation. You can do this.";
                 }
-            });
+            };
+            cravingBusterBtn.addEventListener('click', getCravingTip);
+            const closeModal = () => cravingModal.style.display = 'none';
+            closeModalBtn.addEventListener('click', closeModal);
 
-            // AI Coach Logic
             const chatBox = document.getElementById('chat-box');
             const chatInput = document.getElementById('chat-input');
             const sendBtn = document.getElementById('send-btn');
             const typingIndicatorContainer = document.getElementById('typing-indicator-container');
-
-            const systemPrompt = `You are an expert AI companion named 'BreatheFree Coach', designed to help people quit smoking. Your persona is empathetic, supportive, and non-judgmental. Your primary goal is to help users manage cravings and stay motivated.
-                Follow these rules strictly:
-                1.  **Never give medical advice.** If a user asks about health symptoms, withdrawal medications, or serious medical concerns, you MUST advise them to consult a healthcare professional.
-                2.  **Be concise.** Keep your answers relatively short and easy to read on a screen. Use paragraphs and lists where helpful.
-                3.  **Offer actionable strategies.** When a user reports a craving, suggest specific, proven techniques like: the 4 D's (Delay, Deep breaths, Drink water, Distract), mindfulness exercises, physical activity (like a short walk), or engaging a hobby.
-                4.  **Provide motivation and reinforcement.** Remind users of their reasons for quitting and the benefits they are gaining. Acknowledge their hard work and celebrate their progress.
-                5.  **Offer distractions.** If the user needs a distraction, you can suggest a quick game (like "20 questions"), ask them about their favorite music or movie, or tell them an interesting fact.
-                6.  **Maintain your persona.** Always be positive and encouraging. Start conversations by asking how they are feeling.`;
-
+            const systemPrompt = `You are an expert AI companion named 'BreatheFree Coach', designed to help people quit smoking. Your persona is empathetic, supportive, and non-judgmental. Your primary goal is to help users manage cravings and stay motivated. Follow these rules strictly: 1. Never give medical advice. If a user asks about health symptoms, withdrawal medications, or serious medical concerns, you MUST advise them to consult a healthcare professional. 2. Be concise. 3. Offer actionable strategies. 4. Provide motivation and reinforcement. 5. Offer distractions. 6. Maintain your persona.`;
             const appendMessage = (message, sender) => {
                 const messageDiv = document.createElement('div');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message', 'p-3', 'rounded-lg', 'max-w-md');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message', 'p-3', 'px-5', 'max-w-md');
                 messageDiv.textContent = message;
                 chatBox.appendChild(messageDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
             };
-
             const showTypingIndicator = (show) => {
                 typingIndicatorContainer.style.display = show ? 'block' : 'none';
-                if (show) {
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
+                if (show) chatBox.scrollTop = chatBox.scrollHeight;
             };
-
             const callGemini = async (userQuery) => {
                 showTypingIndicator(true);
                 const apiKey = "";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                };
-
-                let responseText = "I'm having a little trouble connecting right now. Please try again in a moment. Remember to take a deep breath; you can get through this.";
+                const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] },};
+                let responseText = "I'm having a little trouble connecting right now. Please try again. Remember to breathe deeply.";
                 try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        console.error("API Error:", response.status, await response.text());
-                    } else {
-                        const result = await response.json();
-                        const candidate = result.candidates?.[0];
-                        if (candidate && candidate.content?.parts?.[0]?.text) {
-                            responseText = candidate.content.parts[0].text;
-                        }
-                    }
-                } catch (error) {
-                    console.error("Fetch Error:", error);
-                } finally {
-                    showTypingIndicator(false);
-                    appendMessage(responseText, 'ai');
-                }
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { console.error("API Error:", response.status, await response.text()); }
+                    else { const result = await response.json(); const candidate = result.candidates?.[0]; if (candidate?.content?.parts?.[0]?.text) { responseText = candidate.content.parts[0].text; } }
+                } catch (error) { console.error("Fetch Error:", error); }
+                finally { showTypingIndicator(false); appendMessage(responseText, 'ai'); }
             };
-            
-            const handleSendMessage = () => {
-                const userInput = chatInput.value.trim();
-                if (userInput) {
-                    appendMessage(userInput, 'user');
-                    callGemini(userInput);
-                    chatInput.value = '';
-                }
-            };
-
+            const handleSendMessage = () => { const userInput = chatInput.value.trim(); if (userInput) { appendMessage(userInput, 'user'); callGemini(userInput); chatInput.value = ''; } };
             sendBtn.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    handleSendMessage();
+            chatInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') handleSendMessage(); });
+
+            const loginBtn = document.getElementById('login-btn');
+            const loginPromptBtn = document.getElementById('login-prompt-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userInfo = document.getElementById('user-info');
+            const userEmailEl = document.getElementById('user-email');
+            const authModal = document.getElementById('authModal');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const trackerSignedOutMessage = document.getElementById('tracker-signed-out-message');
+            const trackerSignedInContent = document.getElementById('tracker-signed-in-content');
+
+            const showAuthModal = () => authModal.style.display = 'flex';
+            const hideAuthModal = () => authModal.style.display = 'none';
+            loginBtn.addEventListener('click', showAuthModal);
+            loginPromptBtn.addEventListener('click', showAuthModal);
+            logoutBtn.addEventListener('click', () => signOut(auth));
+            
+            window.addEventListener('click', (event) => {
+                if (event.target === authModal || event.target === cravingModal) {
+                    hideAuthModal();
+                    closeModal();
                 }
             });
 
-            // Quit Tracker Logic
+            authModal.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    authModal.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    authModal.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    authModal.querySelector(`#${tabName}`).classList.add('active');
+                });
+            });
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+                try {
+                    errorEl.textContent = '';
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Login error:", error);
+                    errorEl.textContent = error.message.replace('Firebase: ', '');
+                }
+            });
+
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const errorEl = document.getElementById('signup-error');
+                try {
+                    errorEl.textContent = '';
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    errorEl.textContent = error.message.replace('Firebase: ', '');
+                }
+            });
+            
             const trackerSetup = document.getElementById('trackerSetup');
             const trackerDashboard = document.getElementById('trackerDashboard');
             const startTrackingBtn = document.getElementById('startTrackingBtn');
             const resetTrackerBtn = document.getElementById('resetTrackerBtn');
-
             const daysSmokeFreeEl = document.getElementById('daysSmokeFree');
             const moneySavedEl = document.getElementById('moneySaved');
             const cigsNotSmokedEl = document.getElementById('cigsNotSmoked');
+            const lifeRegainedEl = document.getElementById('lifeRegained');
             const milestonesContainer = document.getElementById('milestonesContainer');
-
-            let quitData = {};
-            let intervalId;
-
-            const healthMilestones = [
-                { time: 20 * 60, text: "Your blood pressure and pulse rate return to normal.", achieved: false },
-                { time: 8 * 3600, text: "Oxygen levels in your blood return to normal.", achieved: false },
-                { time: 48 * 3600, text: "Your ability to taste and smell improves.", achieved: false },
-                { time: 72 * 3600, text: "Breathing becomes easier as your bronchial tubes relax.", achieved: false },
-                { time: 14 * 24 * 3600, text: "Your circulation and lung function improve.", achieved: false },
-                { time: 90 * 24 * 3600, text: "Coughing and shortness of breath decrease.", achieved: false },
-                { time: 365 * 24 * 3600, text: "Your risk of coronary heart disease is halved.", achieved: false },
-                { time: 5 * 365 * 24 * 3600, text: "Your stroke risk is reduced to that of a non-smoker.", achieved: false },
-                { time: 10 * 365 * 24 * 3600, text: "Your risk of lung cancer is about half that of a smoker.", achieved: false },
-            ];
-
-            function startTracker(data) {
-                trackerSetup.classList.add('hidden');
-                trackerDashboard.classList.remove('hidden');
-                quitData = data;
-                localStorage.setItem('quitData', JSON.stringify(quitData));
-
-                if (intervalId) clearInterval(intervalId);
-                updateDashboard(); // Run once immediately
-                intervalId = setInterval(updateDashboard, 1000);
-            }
-            
+            const smokeFreeLabel = document.getElementById('smokeFreeLabel');
+            // New UI Elements
+            const personalMotivationInput = document.getElementById('personalMotivation');
+            const saveMotivationBtn = document.getElementById('saveMotivationBtn');
+// ... existing code ... -->
             function updateDashboard() {
+                if (!quitData.quitDate) return;
                 const now = new Date();
                 const quitDate = new Date(quitData.quitDate);
                 const secondsSinceQuit = (now - quitDate) / 1000;
                 
                 if (secondsSinceQuit < 0) {
-                    daysSmokeFreeEl.textContent = "Starts soon!";
+                    smokeFreeLabel.textContent = "COUNTDOWN TO FREEDOM";
+                    const secondsToGo = -secondsSinceQuit;
+                    const days = Math.floor(secondsToGo / (24 * 3600));
+                    const hours = Math.floor((secondsToGo % (24 * 3600)) / 3600);
+                    const minutes = Math.floor((secondsToGo % 3600) / 60);
+                    const seconds = Math.floor(secondsToGo % 60);
+
+                    daysSmokeFreeEl.classList.remove('text-5xl');
+                    daysSmokeFreeEl.classList.add('text-4xl');
+                    daysSmokeFreeEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    
                     moneySavedEl.textContent = "$0";
                     cigsNotSmokedEl.textContent = "0";
-                    milestonesContainer.innerHTML = `<p class="text-gray-500">Your health milestones will appear here once you quit!</p>`;
+                    lifeRegainedEl.textContent = "0 Mins";
+                    milestonesContainer.innerHTML = `<p class="text-slate-500">Your health milestones will appear here once your quit journey begins!</p>`;
                     return;
                 }
+
+                // Restore original state if countdown is finished
+                smokeFreeLabel.textContent = "SMOKE-FREE FOR";
+                daysSmokeFreeEl.classList.add('text-5xl');
+                daysSmokeFreeEl.classList.remove('text-4xl');
 
                 const days = secondsSinceQuit / (24 * 3600);
                 const moneyPerCig = quitData.pricePerPack / 20;
                 const cigsPerSecond = quitData.cigsPerDay / (24 * 3600);
-
                 const cigsAvoided = Math.floor(cigsPerSecond * secondsSinceQuit);
                 const moneySaved = (cigsAvoided * moneyPerCig).toFixed(2);
+                const lifeRegainedInMinutes = cigsAvoided * 11; // 11 minutes per cigarette
 
                 daysSmokeFreeEl.textContent = `${days.toFixed(2)} Days`;
                 moneySavedEl.textContent = `$${moneySaved}`;
                 cigsNotSmokedEl.textContent = cigsAvoided.toLocaleString();
-
+                lifeRegainedEl.textContent = formatLifeRegained(lifeRegainedInMinutes);
                 renderMilestones(secondsSinceQuit);
             }
 
@@ -537,58 +669,85 @@
                 healthMilestones.forEach(milestone => {
                     const progress = Math.min((secondsSinceQuit / milestone.time) * 100, 100);
                     const isAchieved = progress >= 100;
-                    
                     const milestoneEl = document.createElement('div');
                     milestoneEl.innerHTML = `
                         <div class="flex justify-between items-center mb-2">
-                            <p class="font-medium ${isAchieved ? 'text-green-600' : ''}">${milestone.text}</p>
-                            ${isAchieved ? '<span class="text-green-600 font-bold">&#10003; Achieved</span>' : `<span class="text-gray-500">${Math.floor(progress)}%</span>`}
+                            <p class="font-medium ${isAchieved ? 'text-blue-600' : 'text-slate-700'}">${milestone.text}</p>
+                            ${isAchieved ? '<span class="text-blue-600 font-bold">&#10003; Achieved</span>' : `<span class="text-slate-500 text-sm font-semibold">${Math.floor(progress)}%</span>`}
                         </div>
-                        <div class="milestone-bar">
-                            <div class="milestone-progress" style="width: ${progress}%;"></div>
-                        </div>
-                    `;
+                        <div class="milestone-bar"><div class="milestone-progress" style="width: ${progress}%;"></div></div>`;
                     milestonesContainer.appendChild(milestoneEl);
                 });
             }
 
+            function renderCravingsData(cravings) {
+                cravingsTotalEl.textContent = cravings.length;
+                if (cravings.length > 0) {
+                    const lastCraving = new Date(cravings[cravings.length - 1].seconds * 1000);
+                    const now = new Date();
+                    const diffMs = now - lastCraving;
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    if (diffHours < 24) {
+                        cravingsLastEl.textContent = `${diffHours} hours ago`;
+                    } else {
+                        cravingsLastEl.textContent = `${Math.floor(diffHours / 24)} days ago`;
+                    }
+                } else {
+                    cravingsLastEl.textContent = 'N/A';
+                }
+            }
+
+            saveMotivationBtn.addEventListener('click', async () => {
+                const motivation = personalMotivationInput.value.trim();
+                if (motivation && currentUser) {
+                    const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid);
+                    await updateDoc(userDocRef, { personalMotivation: motivation });
+                    quitData.personalMotivation = motivation;
+                    motivationText.textContent = motivation;
+                    motivationInputContainer.classList.add('hidden');
+                    motivationDisplay.classList.remove('hidden');
+                }
+            });
+
+            editMotivationBtn.addEventListener('click', () => {
+                personalMotivationInput.value = quitData.personalMotivation || '';
+                motivationInputContainer.classList.remove('hidden');
+                motivationDisplay.classList.add('hidden');
+            });
+            
+            logCravingBtn.addEventListener('click', async () => {
+                if (currentUser) {
+                    const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid);
+                    const newCraving = new Date();
+                    await updateDoc(userDocRef, { cravings: arrayUnion(newCraving) });
+                    if (!quitData.cravings) quitData.cravings = [];
+                    quitData.cravings.push({seconds: Math.floor(newCraving.getTime()/1000)}); // Simulate Firestore timestamp for immediate render
+                    renderCravingsData(quitData.cravings);
+                }
+            });
 
             startTrackingBtn.addEventListener('click', () => {
+                if (!currentUser) { showAuthModal(); return; }
                 const quitDate = document.getElementById('quitDate').value;
-                const cigsPerDay = document.getElementById('cigsPerDay').value;
-                const pricePerPack = document.getElementById('pricePerPack').value;
-
                 if (!quitDate) {
                     alert("Please select a quit date to begin.");
                     return;
                 }
-
                 const data = {
                     quitDate,
-                    cigsPerDay: parseFloat(cigsPerDay) || 0,
-                    pricePerPack: parseFloat(pricePerPack) || 0,
+                    cigsPerDay: parseFloat(document.getElementById('cigsPerDay').value) || 0,
+                    pricePerPack: parseFloat(document.getElementById('pricePerPack').value) || 0,
+                    personalMotivation: quitData.personalMotivation || "",
+                    cravings: quitData.cravings || []
                 };
-                startTracker(data);
+                saveTrackerData(currentUser.uid, data);
             });
             
             resetTrackerBtn.addEventListener('click', () => {
-                if (confirm("Are you sure you want to reset your tracker? This will clear your quit date.")) {
-                    localStorage.removeItem('quitData');
-                    if(intervalId) clearInterval(intervalId);
-                    trackerSetup.classList.remove('hidden');
-                    trackerDashboard.classList.add('hidden');
-                }
+                trackerDashboard.classList.add('hidden');
+                trackerSetup.classList.remove('hidden');
+                if (intervalId) clearInterval(intervalId);
             });
-
-            // Load from localStorage on page load
-            const savedData = localStorage.getItem('quitData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                document.getElementById('quitDate').value = data.quitDate.split('T')[0]; // Format for input
-                document.getElementById('cigsPerDay').value = data.cigsPerDay;
-                document.getElementById('pricePerPack').value = data.pricePerPack;
-                startTracker(data);
-            }
         });
     </script>
 </body>
