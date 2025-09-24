@@ -15,14 +15,14 @@
             background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
         }
         .milestone-bar {
-            background-color: #e2e8f0; /* slate-200 */
+            background-color: #e2e8f0; 
             border-radius: 9999px;
             overflow: hidden;
             height: 10px;
         }
         .milestone-progress {
             height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #93c5fd); /* blue-500 to blue-300 */
+            background: linear-gradient(90deg, #3b82f6, #93c5fd); 
             transition: width 0.5s ease-in-out;
             border-radius: 9999px;
         }
@@ -53,14 +53,14 @@
             overflow-y: auto;
         }
         .user-message {
-            background-color: #2563eb; /* blue-600 */
+            background-color: #2563eb; 
             color: white;
             align-self: flex-end;
             border-radius: 20px 20px 4px 20px;
         }
         .ai-message {
-            background-color: #f1f5f9; /* slate-100 */
-            color: #1e293b; /* slate-800 */
+            background-color: #f1f5f9; 
+            color: #1e293b; 
             align-self: flex-start;
             border-radius: 20px 20px 20px 4px;
         }
@@ -73,7 +73,7 @@
             height: 8px;
             width: 8px;
             margin: 0 2px;
-            background-color: #94a3b8; /* slate-400 */
+            background-color: #94a3b8; 
             border-radius: 50%;
             display: inline-block;
             animation: bounce 1.4s infinite ease-in-out both;
@@ -87,8 +87,8 @@
         #authModal .tab-content { display: none; }
         #authModal .tab-content.active { display: block; }
         #authModal .tab.active {
-            border-bottom-color: #2563eb; /* blue-600 */
-            color: #1d4ed8; /* blue-700 */
+            border-bottom-color: #2563eb; 
+            color: #1d4ed8; 
             font-weight: 600;
         }
         .input-field {
@@ -125,7 +125,6 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
         <section class="hero-gradient text-white text-center py-24 px-6 relative overflow-hidden">
             <div class="absolute inset-0 bg-black opacity-10"></div>
             <div class="relative z-10">
@@ -135,7 +134,6 @@
             </div>
         </section>
 
-        <!-- Benefits Section -->
         <section id="benefits" class="py-24 bg-white">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16">
@@ -143,7 +141,6 @@
                     <p class="text-lg text-slate-600 max-w-2xl mx-auto">The benefits of quitting start almost immediately. Here's what you have to look forward to.</p>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Cards updated with new premium-card class -->
                     <div class="premium-card text-center">
                         <div class="bg-blue-100 text-blue-600 rounded-full p-4 inline-block mb-5 ring-8 ring-blue-50">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
@@ -176,7 +173,6 @@
             </div>
         </section>
 
-        <!-- Quit Tracker Section -->
         <section id="tracker" class="py-24 bg-slate-50">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Your Personal Quit Dashboard</h2>
@@ -233,7 +229,6 @@
                         <div class="max-w-6xl mx-auto mt-8">
                             <h3 class="text-2xl font-bold mb-6 text-slate-700">Health Milestones Achieved</h3>
                             <div id="milestonesContainer" class="space-y-6 premium-card p-8">
-                                <!-- Milestones will be dynamically inserted here -->
                             </div>
                         </div>
                          <button id="resetTrackerBtn" class="mt-8 font-semibold text-slate-700 bg-slate-200 px-6 py-3 rounded-full hover:bg-slate-300 hover:shadow-md transition-all duration-300">Change My Quit Date</button>
@@ -261,7 +256,6 @@
             </div>
         </section>
 
-        <!-- Tips Section -->
         <section id="tips" class="py-24 bg-white">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16">
@@ -315,7 +309,6 @@
             </div>
         </section>
 
-        <!-- Craving Buster -->
         <section class="bg-blue-100 py-24">
              <div class="container mx-auto px-6 text-center">
                  <h2 class="text-4xl font-extrabold text-blue-800 mb-4">Feeling a Craving?</h2>
@@ -324,7 +317,6 @@
              </div>
         </section>
 
-        <!-- AI Quit Coach Section -->
         <section id="ai-coach" class="py-24 bg-slate-50">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16">
@@ -348,7 +340,6 @@
             </div>
         </section>
         
-        <!-- Resources Section -->
         <section id="resources" class="py-24 bg-white">
             <div class="container mx-auto px-6">
                  <h2 class="text-4xl font-extrabold text-center mb-16 text-slate-800">Helpful Resources</h2>
@@ -370,7 +361,6 @@
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-slate-800 text-white py-12">
         <div class="container mx-auto px-6 text-center">
             <p class="font-semibold">&copy; 2025 BreatheFree. All Rights Reserved.</p>
@@ -378,7 +368,6 @@
         </div>
     </footer>
 
-    <!-- Craving Buster Modal -->
     <div id="cravingModal" class="modal">
         <div class="modal-content bg-white p-8 rounded-2xl shadow-2xl max-w-sm mx-4 text-center border-4 border-blue-300">
             <h3 class="text-2xl font-bold text-blue-600 mb-4">You're Stronger Than the Craving!</h3>
@@ -387,7 +376,6 @@
         </div>
     </div>
 
-    <!-- Auth Modal -->
     <div id="authModal" class="modal">
         <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4">
             <div class="p-6">
@@ -430,13 +418,11 @@
 
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            // State management
             let currentUser = null;
             let quitData = {};
             let intervalId;
             const LOCAL_STORAGE_KEY = 'breatheFreeData_alleningles001';
 
-            // DOM Elements
             const loginBtn = document.getElementById('login-btn');
             const loginPromptBtn = document.getElementById('login-prompt-btn');
             const logoutBtn = document.getElementById('logout-btn');
@@ -467,7 +453,6 @@
             const cravingsTotalEl = document.getElementById('cravingsTotal');
             const cravingsLastEl = document.getElementById('cravingsLast');
 
-            // --- Authentication & UI Updates ---
 
             const updateUIForLogin = (user) => {
                 currentUser = user;
@@ -541,7 +526,6 @@
             });
 
 
-            // --- Data Persistence (Local Storage) ---
 
             function saveTrackerData(data) {
                 if (!currentUser) return;
@@ -581,8 +565,6 @@
                     trackerSetup.classList.remove('hidden');
                 }
             }
-
-            // --- Tracker Logic ---
 
             const healthMilestones = [
                 { time: 20 * 60, text: "Your blood pressure and pulse rate return to normal." },
